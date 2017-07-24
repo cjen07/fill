@@ -32,6 +32,31 @@ defmodule Helper do
     end)
   end
 
+  def merge(l) do
+    Enum.reduce(l, fn x, acc ->
+      do_merge(x, acc)
+    end)
+  end
+
+  def do_merge(x, y) do
+    Enum.zip(x, y)
+    |> Enum.flat_map(fn {x, y} -> 
+      cond do
+        is_atom(x) && x == y ->
+          [x]
+        is_map(x) && is_map(y) ->
+          d = intersection(x, y)
+          if d == %{} do
+            throw(:error2)
+          else
+            [d]
+          end
+        true ->
+          throw(:error3)
+      end
+    end)
+  end
+
   def intersection(x, y) do
     [x, y]
     |> Enum.map(fn x -> Map.keys(x) |> MapSet.new() end)
