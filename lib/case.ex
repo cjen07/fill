@@ -12,5 +12,16 @@ defmodule Case do
     # just upcase the first letter
     String.split_at(s, 1) |> (fn {x, y} -> String.upcase(x) <> y end).() 
   end
+
+  def f3(s) do
+    # upcase the first letter
+    # downcase the others
+    String.split_at(s, 1) |> (fn {x, y} -> String.upcase(x) <> String.downcase(y) end).() 
+  end
+
+  def m1(s) do
+    d = String.split(s, " ")
+    Enum.at(d, -1) <> ", " <> f3(Enum.at(d, 0))
+  end
   
 end
