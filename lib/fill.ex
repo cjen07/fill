@@ -33,7 +33,7 @@ defmodule Fill do
   end
 
   # Fill.fit1 10, :f, 4..10
-  # ok for :f0, :f1, :f2
+  # ok for :f0, :f1, :f2, :a0, :a1
   def fit1(n, f, r) do
     generate(n, f, r, :all)
     |> Enum.map(fn {s0, s1} -> 
