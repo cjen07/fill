@@ -15,6 +15,17 @@ defmodule DSL do
     String.split_at(s, a) |> elem(b)
   end
 
+  def substr(s, a, b) do
+    String.split_at(s, a)
+    |> elem(1)
+    |> String.split_at(b)
+    |> elem(0)
+  end
+
+  def const(s) do
+    s
+  end
+
   def join(s1, s2) do
     # length increase
     s1 <> s2

@@ -40,17 +40,17 @@ defmodule Helper do
           :del -> flat_search(t, d1, s0, s1)
           _ ->
             case k do
-              :eq -> {train_bk(s0, v), fn x -> x end}
+              :eq -> {train_mix1(s0, v), fn x -> x end}
               :ins -> 
                 cond do
                   String.contains?(s0, v) ->
-                    {train_bk(s0, v), fn x -> x end}
+                    {train_mix1(s0, v), fn x -> x end}
                   String.contains?(s0, down(v)) 
                   && up(down(v)) == v ->
-                    {train_bk(s0, down(v)), fn x -> {:up, x} end}
+                    {train_mix1(s0, down(v)), fn x -> {:up, x} end}
                   String.contains?(s0, up(v)) 
                   && down(up(v)) == v ->
-                    {train_bk(s0, up(v)), fn x -> {:down, x} end}
+                    {train_mix1(s0, up(v)), fn x -> {:down, x} end}
                   true ->
                     throw(:error1)
                 end 
@@ -108,6 +108,11 @@ defmodule Helper do
         is_tuple(x) ->
           {e0, e1} = x
           case e0 do
+            :const ->
+              s
+            :substr ->
+              {a0, a1} = e1
+              substr(s, a0, a1)
             :up -> 
               do_run_direct(e1, s)
               |> Enum.at(0)
@@ -129,6 +134,44 @@ defmodule Helper do
       end
     rescue
       _ -> []
+    end
+  end
+
+  def train_mix1(s0, s1) do
+    %{
+      bk1: train_bk1(s0, s1), 
+      bk2: train_bk2(s0, s1)
+    }
+    |> (fn x -> 
+      case train_const(s0, s1) do
+        :ok -> Map.put(x, :const, [:ok])
+        :nil -> x
+      end
+    end).()
+    |> (fn x -> 
+      d = train_substr(s0, s1)
+      case d do
+        [] -> x
+        _ -> Map.put(x, :substr, d)
+      end
+    end).()
+  end
+
+  def train_substr(s0, s1) do
+    sub_strings_with_index(s0)
+    |> Enum.filter(fn x -> 
+      elem(x, 0) == s1
+    end)
+    |> Enum.map(fn x -> 
+      elem(x, 1)
+    end)
+  end
+
+  def train_const(s0, s1) do
+    if s0 == s1 do
+      :ok
+    else
+      :nil
     end
   end
 
@@ -198,6 +241,20 @@ defmodule Helper do
       |> Enum.map(fn x -> Map.get(x, k) |> MapSet.new() end)
       |> (fn [x, y] -> MapSet.intersection(x, y) |> MapSet.to_list() end).()
       |-1> Map.put(acc, k) 
+    end)
+  end
+
+  # to-do better programming experience add a line to a function
+  def sub_strings_with_index(s) do
+    l = String.length(s)
+    Enum.flat_map(1..l-1, fn x -> 
+      Enum.map(0..l-x, fn y -> 
+        String.split_at(s, y)
+        |> elem(1)
+        |> String.split_at(x)
+        |> elem(0)
+        |> (fn d -> {d, {y, x}} end).()
+      end) 
     end)
   end
 
