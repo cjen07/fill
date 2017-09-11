@@ -38,4 +38,21 @@ defmodule DSL do
   def down(s) do
     String.downcase(s)
   end
+
+  def move(s, a, x) do
+    cond do
+      x > 0 ->
+        {s1, s2} = String.split_at(s, a + x)
+        {s3, s4} = String.split_at(s1, a - 1)
+        {s5, s6} = String.split_at(s4, 1)
+        s3 <> s6 <> s5 <> s2
+      x < 0 ->
+        {s1, s2} = String.split_at(s, a)
+        {s3, s4} = String.split_at(s1, a + x - 1)
+        {s5, s6} = String.split_at(s4, -1)
+        s3 <> s6 <> s5 <> s2
+      true ->
+        s
+    end
+  end
 end

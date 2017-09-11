@@ -4,7 +4,10 @@ defmodule Helper do
   import DSL
 
   def rl(r) do
-    Enum.random(r)
+    cond do
+      is_integer(r) -> r
+      true -> Enum.random(r)
+    end
   end
 
   def rs(l, t) do
